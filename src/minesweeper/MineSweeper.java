@@ -6,7 +6,7 @@ package minesweeper;
 public class MineSweeper {
     private FieldGenerator generator;
     public MineSweeper() {
-        generator = new FieldGenerator(15,15,20);
+        generator = new FieldGenerator();
     }
 
     public void startGame() {
