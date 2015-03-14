@@ -1,7 +1,9 @@
 package minesweeper;
 
+import java.util.Scanner;
+
 /**
- * Created by Aaron on 2015-03-13.
+ * Class for displaying the MineSweeper game on the command console
  */
 public class ConsoleDisplay {
     private FieldGenerator field;
@@ -71,5 +73,24 @@ public class ConsoleDisplay {
             }
             System.out.println("\n");
         }
+    }
+
+    public int[] getMove() {
+        String strMove;
+        int[] move;
+        Scanner input = new Scanner(System.in);
+        System.out.println("What is the move you would like to make? (Enter as: x, y)");
+        strMove = input.nextLine();
+        try {
+            int x = Integer.parseInt(strMove.substring(0, strMove.indexOf(",")));
+            int y = Integer.parseInt(strMove.substring(strMove.indexOf(",") + 2));
+            move = new int[2];
+            move[0] = x;
+            move[1] = y;
+        } catch (NumberFormatException e) {
+            System.out.println("INVALID INPUT. TRY AGAIN.");
+            move = this.getMove();
+        }
+        return move;
     }
 }

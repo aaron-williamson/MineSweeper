@@ -142,6 +142,12 @@ public class FieldGenerator {
         }
     }
 
+    public boolean revealSpace(int x, int y) {
+        if (field[x][y] == -1) return true;
+        reveal[x][y] = true;
+        return false;
+    }
+
     /**
      * Gets the field
      * @return this field
