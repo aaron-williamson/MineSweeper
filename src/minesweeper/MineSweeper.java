@@ -10,7 +10,7 @@ public class MineSweeper {
     }
 
     public void startGame() {
-        consoleDisplay display = new consoleDisplay(generator);
+        ConsoleDisplay display = new ConsoleDisplay(generator);
         System.out.println("Revealed field:");
         display.printFieldRevealed();
         System.out.println("\nTrue field:");
