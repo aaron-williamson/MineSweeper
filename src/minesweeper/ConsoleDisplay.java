@@ -7,15 +7,21 @@ import java.util.Scanner;
  */
 public class ConsoleDisplay {
     private FieldGenerator field;
+    private Scanner input = new Scanner(System.in);
 
     /**
-     * Constructor
+     * Constructors
      * @param aField the field to construct this console display with
      */
     public ConsoleDisplay(FieldGenerator aField) {
         // Set the field
         field = aField;
     }
+
+    public ConsoleDisplay() {
+        // Do nothing
+    }
+
     /**
      * Prints out the minefield with all tiles revealed
      */
@@ -46,6 +52,8 @@ public class ConsoleDisplay {
     }
 
     public void printField() {
+        // Print the number of mines remaining
+        System.out.println("Mines remaining: " + field.getMinesRemaining());
         // Print out the number lines
         System.out.print("      ");
         for (int i = 0; i < field.getField().length; i++) {
@@ -62,12 +70,14 @@ public class ConsoleDisplay {
             else
                 System.out.print("  [" + (i) + "]");
             for (int j = 0; j < field.getField()[0].length; j++) {
-                boolean revealed = field.getReveal()[i][j];
-                if (revealed) {
+                int mask = field.getMask()[i][j];
+                if (mask == 1) {
                     int out = field.getField()[i][j];
                     if (out == 0) System.out.print("  .  ");
-                    else if (out == -1) System.out.print("  X  ");
                     else System.out.printf("  %d  ", out);
+                }
+                else if (mask == -1) {
+                    System.out.print("  X  ");
                 }
                 else System.out.print("  O  ");
             }
@@ -75,22 +85,38 @@ public class ConsoleDisplay {
         }
     }
 
-    public int[] getMove() {
+    public Coordinate getCoord(String command) {
         String strMove;
-        int[] move;
-        Scanner input = new Scanner(System.in);
-        System.out.println("What is the move you would like to make? (Enter as: x, y)");
+        Coordinate coord;
+        System.out.println("What is the position you would like to " + command + "? (Enter as: " +
+                "vertical, horizontal)");
         strMove = input.nextLine();
         try {
             int x = Integer.parseInt(strMove.substring(0, strMove.indexOf(",")));
             int y = Integer.parseInt(strMove.substring(strMove.indexOf(",") + 2));
-            move = new int[2];
-            move[0] = x;
-            move[1] = y;
+            coord = new Coordinate(x,y);
         } catch (NumberFormatException e) {
             System.out.println("INVALID INPUT. TRY AGAIN.");
-            move = this.getMove();
+            coord = this.getCoord(command);
         }
-        return move;
+        return coord;
+    }
+
+    public String getCommand() {
+        String command;
+        System.out.println("What would you like to do? (reveal, mark, unmark)");
+        command = input.nextLine();
+        if (!command.equals("unmark") && !command.equals("mark") && !command.equals("reveal")) {
+            System.out.println("INVALID COMMAND. PLEASE TRY AGAIN.");
+            command = this.getCommand();
+        }
+        return command;
+    }
+    public void printMessage(String message) {
+        System.out.println(message);
+    }
+
+    public void setField(FieldGenerator field) {
+        this.field = field;
     }
 }

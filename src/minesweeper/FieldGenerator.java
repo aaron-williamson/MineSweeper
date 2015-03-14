@@ -13,17 +13,23 @@ public class FieldGenerator {
     private static final int DEFAULT_Y = 9;
     private static final int DEFAULT_MINES = 10;
     private int[][] field;
-    private boolean[][] reveal;
+    private int[][] mask;
     private Random rand = new Random();
+    private int minesRemaining;
+    private int unrevealed;
+    private int mines;
+    private ConsoleDisplay display;
 
     /**
      * Constructor
      */
-    public FieldGenerator() {
+    public FieldGenerator(ConsoleDisplay display) {
+        this.display = display;
         generateField(DEFAULT_X, DEFAULT_Y, DEFAULT_MINES);
     }
 
-    public FieldGenerator(int x, int y, int mines) {
+    public FieldGenerator(ConsoleDisplay display, int x, int y, int mines) {
+        this.display = display;
         generateField(x, y, mines);
     }
 
@@ -36,6 +42,10 @@ public class FieldGenerator {
      * @param mines desired number of mines for the field
      */
     private void generateField(int x, int y, int mines) {
+        // Initialize the variables
+        minesRemaining = mines;
+        unrevealed = x * y;
+        this.mines = mines;
         // First create the field and fill it with 0's (non-mines)
         field = new int[x][y];
         for (int i = 0; i < x; i++) {
@@ -44,10 +54,10 @@ public class FieldGenerator {
             }
         }
         // Also create the reveal field and initialize it with false
-        reveal = new boolean[x][y];
+        mask = new int[x][y];
         for (int i = 0; i < x; i++) {
             for (int j = 0; j < y; j++) {
-                reveal[i][j] = false;
+                mask[i][j] = 0;
             }
         }
         // Now randomize the mines and set the values around the mines
@@ -143,9 +153,131 @@ public class FieldGenerator {
     }
 
     public boolean revealSpace(int x, int y) {
-        if (field[x][y] == -1) return true;
-        reveal[x][y] = true;
+        if (mask[x][y] == -1) {
+            display.printMessage("Space at (" + x + ", " + y + ") is marked as a mine.\n" +
+                    "Use unmark command to unmark it.");
+            return false;
+        }
+        else if (field[x][y] == -1) return true;
+        else if (mask[x][y] == 1) {
+            display.printMessage("Space already revealed.");
+            return false;
+        }
+        revealHelper(x, y);
         return false;
+    }
+
+    private void revealHelper(int x, int y) {
+        if (mask[x][y] == 1) return;
+        if (mask[x][y] == -1) return;
+        else if (field[x][y] == 0) {
+            mask[x][y] = 1;
+            unrevealed--;
+            // Top left
+            if (x == 0 && y == 0) {
+                revealHelper(x,y+1); // Right
+                revealHelper(x+1,y+1); // Below right
+                revealHelper(x+1,y); // Below middle
+            }
+            // Top right
+            else if (x == 0 && y == field[x].length - 1) {
+                revealHelper(x,y-1); // Left
+                revealHelper(x+1,y-1); // Below left
+                revealHelper(x+1,y); // Below middle
+            }
+            // Bottom left
+            else if (x == field.length - 1 && y == 0) {
+                revealHelper(x,y+1); // Right
+                revealHelper(x-1,y+1); // Above right
+                revealHelper(x-1,y); // Above middle
+            }
+            // Bottom right
+            else if (x == field.length - 1 && y == field[x].length - 1) {
+                revealHelper(x,y-1); // Left
+                revealHelper(x-1,y); // Above middle
+                revealHelper(x-1,y-1); // Above left
+            }
+            // Far left column
+            else if (y == 0) {
+                revealHelper(x-1,y+1); // Above right
+                revealHelper(x-1,y); // Above middle
+                revealHelper(x,y+1); // Right
+                revealHelper(x+1,y); // Below middle
+                revealHelper(x+1,y+1); // Below right
+            }
+            // Far right column
+            else if (y == field[x].length - 1) {
+                revealHelper(x+1,y); // Below middle
+                revealHelper(x+1,y-1); // Below left
+                revealHelper(x,y-1); // Left
+                revealHelper(x-1,y); // Above middle
+                revealHelper(x-1,y-1); // Above left
+            }
+            // Top row
+            else if (x == 0) {
+                revealHelper(x+1,y+1); // Below right
+                revealHelper(x+1,y); // Below middle
+                revealHelper(x+1,y-1); // Below left
+                revealHelper(x,y+1); // Right
+                revealHelper(x,y-1); // Left
+            }
+            // Bottom row
+            else if (x == field.length - 1) {
+                revealHelper(x,y+1); // Right
+                revealHelper(x,y-1); // Left
+                revealHelper(x-1,y+1); // Above right
+                revealHelper(x-1,y); // Above middle
+                revealHelper(x-1,y-1); // Above left
+            }
+            // Everything else
+            else {
+                revealHelper(x+1,y+1); // Below right
+                revealHelper(x+1,y); // Below middle
+                revealHelper(x+1,y-1); // Below left
+                revealHelper(x,y+1); // Right
+                revealHelper(x,y-1); // Left
+                revealHelper(x-1,y+1); // Above right
+                revealHelper(x-1,y); // Above middle
+                revealHelper(x-1,y-1); // Above left
+            }
+        }
+        else if (field[x][y] == -1) return;
+        else {
+            mask[x][y] = 1;
+            unrevealed--;
+        }
+    }
+
+    /**
+     * Mark the space at x, y as a mine
+     * @param x the x coordinate
+     * @param y the y coordinate
+     */
+    public void markMine(int x, int y) {
+        if (mask[x][y] == 1) {
+            display.printMessage("You can't mark a space that has already been revealed!");
+            return;
+        }
+        if (mask[x][y] == -1) {
+            display.printMessage("That space is already marked as a mine!");
+            return;
+        }
+        minesRemaining--;
+        mask[x][y] = -1;
+    }
+
+    /**
+     * Unmark the space at x, y
+     * @param x the x coordinate
+     * @param y the y coordinate
+     */
+    public void unMark (int x, int y) {
+        if (mask[x][y] != -1) {
+            display.printMessage("That space is not marked.");
+            return;
+        }
+        minesRemaining++;
+        mask[x][y] = 0;
     }
 
     /**
@@ -160,7 +292,19 @@ public class FieldGenerator {
      * Gets the reveal array
      * @return the reveal array
      */
-    public boolean[][] getReveal() {
-        return reveal;
+    public int[][] getMask() {
+        return mask;
+    }
+
+    /**
+     * Gets the amount of mines remaining
+     * @return the amount of unmarked mines
+     */
+    public int getMinesRemaining() {
+        return minesRemaining;
+    }
+
+    public boolean getGameWin() {
+        return (unrevealed <= mines);
     }
 }
