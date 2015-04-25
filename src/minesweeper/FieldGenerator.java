@@ -18,18 +18,15 @@ public class FieldGenerator {
     private int minesRemaining;
     private int unrevealed;
     private int mines;
-    private ConsoleDisplay display;
 
     /**
      * Constructor
      */
-    public FieldGenerator(ConsoleDisplay display) {
-        this.display = display;
+    public FieldGenerator() {
         generateField(DEFAULT_X, DEFAULT_Y, DEFAULT_MINES);
     }
 
-    public FieldGenerator(ConsoleDisplay display, int x, int y, int mines) {
-        this.display = display;
+    public FieldGenerator(int x, int y, int mines) {
         generateField(x, y, mines);
     }
 
@@ -153,14 +150,17 @@ public class FieldGenerator {
     }
 
     public boolean revealSpace(int x, int y) {
-        if (mask[x][y] == -1) {
-            display.printMessage("Space at (" + x + ", " + y + ") is marked as a mine.\n" +
-                    "Use unmark command to unmark it.");
+        if (x > mask.length || y > mask[0].length) {
             return false;
         }
-        else if (field[x][y] == -1) return true;
+        else if (mask[x][y] == -1) {
+            return false;
+        }
+        else if (field[x][y] == -1) {
+            mask[x][y] = 1;
+            return true;
+        }
         else if (mask[x][y] == 1) {
-            display.printMessage("Space already revealed.");
             return false;
         }
         revealHelper(x, y);
@@ -254,12 +254,13 @@ public class FieldGenerator {
      * @param y the y coordinate
      */
     public void markMine(int x, int y) {
-        if (mask[x][y] == 1) {
-            display.printMessage("You can't mark a space that has already been revealed!");
+        if (x > mask.length || y > mask[0].length) {
             return;
         }
-        if (mask[x][y] == -1) {
-            display.printMessage("That space is already marked as a mine!");
+        else if (mask[x][y] == 1) {
+            return;
+        }
+        else if (mask[x][y] == -1) {
             return;
         }
         minesRemaining--;
@@ -272,8 +273,10 @@ public class FieldGenerator {
      * @param y the y coordinate
      */
     public void unMark (int x, int y) {
+        if (x > mask.length || y > mask[0].length) {
+            return;
+        }
         if (mask[x][y] != -1) {
-            display.printMessage("That space is not marked.");
             return;
         }
         minesRemaining++;

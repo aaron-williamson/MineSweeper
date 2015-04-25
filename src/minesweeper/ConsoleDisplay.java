@@ -25,23 +25,23 @@ public class ConsoleDisplay {
     /**
      * Prints out the minefield with all tiles revealed
      */
-    public void printFieldRevealed() {
+    public static void printFieldRevealed(FieldGenerator aField) {
         // Print out the number lines
         System.out.print("      ");
-        for (int i = 0; i < field.getField().length; i++) {
+        for (int i = 0; i < aField.getField().length; i++) {
             if (i < 10)
                 System.out.print(" [" + (i) + "] ");
             else
                 System.out.print(" [" + (i) + "]");
         }
         System.out.println();
-        for (int i = 0; i < field.getField().length; i++) {
+        for (int i = 0; i < aField.getField().length; i++) {
             if (i < 10)
                 System.out.print("  [" + (i) + "] ");
             else
                 System.out.print("  [" + (i) + "]");
-            for (int j = 0; j < field.getField()[0].length; j++) {
-                int out = field.getField()[i][j];
+            for (int j = 0; j < aField.getField()[0].length; j++) {
+                int out = aField.getField()[i][j];
                 if (out == -1) System.out.print("  X  ");
                 else if (out == 0) System.out.print("  .  ");
                 else System.out.printf("  %d  ",out);
