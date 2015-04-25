@@ -8,6 +8,7 @@ public class MineSweeper {
     private boolean gameOver = false;
     private boolean gameWin = false;
     private ConsoleDisplay display;
+    private GUIDisplay gui;
 
     /**
      * Starts the game
@@ -15,6 +16,7 @@ public class MineSweeper {
     public void startGame() {
         // Create a new display
         display = new ConsoleDisplay();
+        gui = new GUIDisplay();
         field = new FieldGenerator(display);
         display.setField(field);
         // Output the revealed field for debugging
