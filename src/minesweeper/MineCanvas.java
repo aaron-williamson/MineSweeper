@@ -15,37 +15,39 @@ import java.io.IOException;
 public class MineCanvas extends JPanel implements MouseListener {
     private boolean gameLose = false;
     private FieldGenerator field;
-    private static final int NUMBER_OF_IMAGES = 12;
+    private static final int NUMBER_OF_IMAGES = 13;
     private static final int BOMB = 9;
     private static final int HIDDEN = 11;
     private static final int FLAG = 10;
+    private static final int INCORRECT = 12;
     private String[] imagePaths = new String[NUMBER_OF_IMAGES];
     private BufferedImage[] images = new BufferedImage[NUMBER_OF_IMAGES];
 
-    public MineCanvas() {
+    public MineCanvas(FieldGenerator aField) {
+        // Initialize the field parameter
+        field = aField;
         // Initialize the image paths
-        imagePaths[0] = "minesweeper/img/tileclear.png";
-        imagePaths[1] = "minesweeper/img/tile1.png";
-        imagePaths[2] = "minesweeper/img/tile2.png";
-        imagePaths[3] = "minesweeper/img/tile3.png";
-        imagePaths[4] = "minesweeper/img/tile4.png";
-        imagePaths[5] = "minesweeper/img/tile5.png";
-        imagePaths[6] = "minesweeper/img/tile6.png";
-        imagePaths[7] = "minesweeper/img/tile7.png";
-        imagePaths[8] = "minesweeper/img/tile8.png";
-        imagePaths[9] = "minesweeper/img/tilebomb.png";
-        imagePaths[10] = "minesweeper/img/tileflag.png";
-        imagePaths[11] = "minesweeper/img/tilehidden.png";
+        imagePaths[0] = "tileclear.png";
+        imagePaths[1] = "tile1.png";
+        imagePaths[2] = "tile2.png";
+        imagePaths[3] = "tile3.png";
+        imagePaths[4] = "tile4.png";
+        imagePaths[5] = "tile5.png";
+        imagePaths[6] = "tile6.png";
+        imagePaths[7] = "tile7.png";
+        imagePaths[8] = "tile8.png";
+        imagePaths[9] = "tilebomb.png";
+        imagePaths[10] = "tileflag.png";
+        imagePaths[11] = "tilehidden.png";
+        imagePaths[12] = "tileincorrect.png";
 
         // Add the mouse listener
         this.addMouseListener(this);
 
+        // JPanel Stuff
+        this.setPreferredSize(new Dimension(field.getField().length * 32, field.getField()[0].length * 32));
         // Load the images
         loadImages();
-    }
-
-    public void setField(FieldGenerator aField) {
-        field = aField;
     }
 
 
@@ -75,12 +77,12 @@ public class MineCanvas extends JPanel implements MouseListener {
      * images.
      */
     private void loadImages() {
-        try {
-            for (int i = 0; i < NUMBER_OF_IMAGES; i++) {
-                images[i] = ImageIO.read(new File(imagePaths[i]));
+        for (int i = 0; i < NUMBER_OF_IMAGES; i++) {
+            try {
+                images[i] = ImageIO.read(new File("minesweeper/img/" + imagePaths[i]));
+            } catch(IOException e) {
+                e.printStackTrace();
             }
-        } catch(IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -121,6 +123,8 @@ public class MineCanvas extends JPanel implements MouseListener {
                 System.exit(0);
             }
             else if (this.gameLose) {
+                field.revealMines();
+                this.repaint();
                 JOptionPane.showMessageDialog(null, "Oops, you revealed a mine! You lose!", "Defeat", JOptionPane.PLAIN_MESSAGE);
                 System.exit(0);
             }

@@ -11,13 +11,12 @@ public class MineSweeper {
      * Starts the game
      */
     public void startGame() {
+        field = new FieldGenerator();
         try {
-            gui = new GUIDisplay();
+            gui = new GUIDisplay(field);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        field = new FieldGenerator();
-        gui.setField(field);
         // Output the revealed field for debugging
         ConsoleDisplay.printFieldRevealed(field);
     }

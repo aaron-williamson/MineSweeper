@@ -310,4 +310,17 @@ public class FieldGenerator {
     public boolean getGameWin() {
         return (unrevealed <= mines);
     }
+
+    /**
+     * Reveals all the mines in the game
+     */
+    public void revealMines() {
+        for(int i = 0; i < field.length; i++) {
+            for (int j = 0; j < field[0].length; j++) {
+                if (field[i][j] == -1) {
+                    revealSpace(i, j);
+                }
+            }
+        }
+    }
 }
