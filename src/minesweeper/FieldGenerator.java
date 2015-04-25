@@ -12,6 +12,14 @@ public class FieldGenerator {
     private static final int DEFAULT_X = 9;
     private static final int DEFAULT_Y = 9;
     private static final int DEFAULT_MINES = 10;
+    public static final int FIELD_MINE = -1;
+    public static final int FIELD_EMPTY = 0;
+    public static final int MASK_HIDDEN = 0;
+    public static final int MASK_REVEALED = 1;
+    public static final int MASK_MARKED = -1;
+    public static final int MASK_LOSE = -2;
+    public static final int MASK_INCORRECT = -3;
+
     private int[][] field;
     private int[][] mask;
     private Random rand = new Random();
@@ -47,14 +55,14 @@ public class FieldGenerator {
         field = new int[x][y];
         for (int i = 0; i < x; i++) {
             for (int j = 0; j < y; j++) {
-                field[i][j] = 0;
+                field[i][j] = FIELD_EMPTY;
             }
         }
         // Also create the reveal field and initialize it with false
         mask = new int[x][y];
         for (int i = 0; i < x; i++) {
             for (int j = 0; j < y; j++) {
-                mask[i][j] = 0;
+                mask[i][j] = MASK_HIDDEN;
             }
         }
         // Now randomize the mines and set the values around the mines
@@ -77,7 +85,7 @@ public class FieldGenerator {
      */
     private void placeMine(int x, int y) {
         // Create the mine
-        field[x][y] = -1;
+        field[x][y] = FIELD_MINE;
 
         // Modify the numbers around the mine HOORAY IF STATEMENTS
         // Top left
@@ -153,14 +161,14 @@ public class FieldGenerator {
         if (x > mask.length || y > mask[0].length) {
             return false;
         }
-        else if (mask[x][y] == -1) {
+        else if (mask[x][y] == MASK_MARKED) {
             return false;
         }
-        else if (field[x][y] == -1) {
-            mask[x][y] = 1;
+        else if (field[x][y] == FIELD_MINE) {
+            mask[x][y] = MASK_LOSE;
             return true;
         }
-        else if (mask[x][y] == 1) {
+        else if (mask[x][y] == MASK_REVEALED) {
             return false;
         }
         revealHelper(x, y);
@@ -168,10 +176,10 @@ public class FieldGenerator {
     }
 
     private void revealHelper(int x, int y) {
-        if (mask[x][y] == 1) return;
-        if (mask[x][y] == -1) return;
+        if (mask[x][y] == MASK_REVEALED) return;
+        if (mask[x][y] == MASK_MARKED) return;
         else if (field[x][y] == 0) {
-            mask[x][y] = 1;
+            mask[x][y] = MASK_REVEALED;
             unrevealed--;
             // Top left
             if (x == 0 && y == 0) {
@@ -241,9 +249,9 @@ public class FieldGenerator {
                 revealHelper(x-1,y-1); // Above left
             }
         }
-        else if (field[x][y] == -1) return;
+        else if (field[x][y] == FIELD_MINE) return;
         else {
-            mask[x][y] = 1;
+            mask[x][y] = MASK_REVEALED;
             unrevealed--;
         }
     }
@@ -257,14 +265,14 @@ public class FieldGenerator {
         if (x > mask.length || y > mask[0].length) {
             return;
         }
-        else if (mask[x][y] == 1) {
+        else if (mask[x][y] == MASK_REVEALED) {
             return;
         }
-        else if (mask[x][y] == -1) {
+        else if (mask[x][y] == MASK_MARKED) {
             return;
         }
         minesRemaining--;
-        mask[x][y] = -1;
+        mask[x][y] = MASK_MARKED;
     }
 
     /**
@@ -276,11 +284,11 @@ public class FieldGenerator {
         if (x > mask.length || y > mask[0].length) {
             return;
         }
-        if (mask[x][y] != -1) {
+        if (mask[x][y] != MASK_MARKED) {
             return;
         }
         minesRemaining++;
-        mask[x][y] = 0;
+        mask[x][y] = MASK_HIDDEN;
     }
 
     /**
@@ -312,13 +320,16 @@ public class FieldGenerator {
     }
 
     /**
-     * Reveals all the mines in the game
+     * Reveals all the mines in the game and sets the
+     * incorrect flags
      */
-    public void revealMines() {
+    public void loseGame() {
         for(int i = 0; i < field.length; i++) {
             for (int j = 0; j < field[0].length; j++) {
-                if (field[i][j] == -1) {
-                    revealSpace(i, j);
+                if (field[i][j] == FIELD_MINE && mask[i][j] != MASK_LOSE && mask[i][j] != MASK_MARKED) {
+                    mask[i][j] = MASK_REVEALED;
+                } else if (mask[i][j] == MASK_MARKED && field[i][j] != FIELD_MINE) {
+                    mask[i][j] = MASK_INCORRECT;
                 }
             }
         }

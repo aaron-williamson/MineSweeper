@@ -15,11 +15,12 @@ import java.io.IOException;
 public class MineCanvas extends JPanel implements MouseListener {
     private boolean gameLose = false;
     private FieldGenerator field;
-    private static final int NUMBER_OF_IMAGES = 13;
+    private static final int NUMBER_OF_IMAGES = 14;
     private static final int BOMB = 9;
-    private static final int HIDDEN = 11;
     private static final int FLAG = 10;
-    private static final int INCORRECT = 12;
+    private static final int HIDDEN = 11;
+    private static final int LOSE = 12;
+    private static final int INCORRECT = 13;
     private String[] imagePaths = new String[NUMBER_OF_IMAGES];
     private BufferedImage[] images = new BufferedImage[NUMBER_OF_IMAGES];
 
@@ -39,7 +40,8 @@ public class MineCanvas extends JPanel implements MouseListener {
         imagePaths[9] = "tilebomb.png";
         imagePaths[10] = "tileflag.png";
         imagePaths[11] = "tilehidden.png";
-        imagePaths[12] = "tileincorrect.png";
+        imagePaths[12] = "tilelose.png";
+        imagePaths[13] = "tileincorrect.png";
 
         // Add the mouse listener
         this.addMouseListener(this);
@@ -57,12 +59,16 @@ public class MineCanvas extends JPanel implements MouseListener {
         super.paintComponent(g);
         for(int x = 0; x < field.getField().length; x++) {
             for (int y = 0; y < field.getField()[0].length; y++) {
-                if (field.getMask()[y][x] == 0) {
+                if (field.getMask()[y][x] == FieldGenerator.MASK_HIDDEN) {
                     g.drawImage(images[HIDDEN], x * 32, y * 32, 32, 32, null);
-                } else if (field.getMask()[y][x] == -1) {
+                } else if (field.getMask()[y][x] == FieldGenerator.MASK_MARKED) {
                     g.drawImage(images[FLAG], x * 32, y * 32, 32, 32, null);
+                }else if (field.getMask()[y][x] == FieldGenerator.MASK_LOSE) {
+                    g.drawImage(images[LOSE], x * 32, y * 32, 32, 32, null);
+                } else if (field.getMask()[y][x] == FieldGenerator.MASK_INCORRECT) {
+                    g.drawImage(images[INCORRECT], x * 32, y * 32, 32, 32, null);
                 } else {
-                    if (field.getField()[y][x] == -1) {
+                    if (field.getField()[y][x] == FieldGenerator.FIELD_MINE) {
                         g.drawImage(images[BOMB], x * 32, y * 32, 32, 32, null);
                     } else {
                         g.drawImage(images[field.getField()[y][x]], x * 32, y * 32, 32, 32, null);
@@ -123,7 +129,7 @@ public class MineCanvas extends JPanel implements MouseListener {
                 System.exit(0);
             }
             else if (this.gameLose) {
-                field.revealMines();
+                field.loseGame();
                 this.repaint();
                 JOptionPane.showMessageDialog(null, "Oops, you revealed a mine! You lose!", "Defeat", JOptionPane.PLAIN_MESSAGE);
                 System.exit(0);
