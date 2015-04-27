@@ -6,36 +6,33 @@ import javax.swing.*;
  * The connecting class for connecting the GUI and Logic
  */
 public class MineSweeper {
+    private static final int DEFAULT_X = 9;
+    private static final int DEFAULT_Y = 9;
+    private static final int DEFAULT_MINES = 10;
+
     private FieldGenerator field;
     private GUIDisplay gui;
 
     /**
      * Starts the game
      */
-    public void startGame() {
-        field = new FieldGenerator();
+    public void startGame(int x, int y, int mines) {
+        field = new FieldGenerator(x, y, mines);
         try {
-            gui = new GUIDisplay(field);
+            gui = new GUIDisplay(field, this);
         } catch (Exception e) {
             e.printStackTrace();
         }
         // Output the revealed field for debugging
-        //ConsoleDisplay.printFieldRevealed(field);
+        ConsoleDisplay.printFieldRevealed(field);
     }
 
-    /**
-     * The game over message
-     */
-    public static void gameLose() {
-        JOptionPane.showMessageDialog(null, "Oops, you revealed a mine! You lose!", "Defeat", JOptionPane.PLAIN_MESSAGE);
-        System.exit(0);
+    public void startGame() {
+        startGame(DEFAULT_X, DEFAULT_Y, DEFAULT_MINES);
     }
 
-    /**
-     * The game win message
-     */
-    public static void gameWin() {
-        JOptionPane.showMessageDialog(null, "Congratulations! You Win!", "Victory", JOptionPane.PLAIN_MESSAGE);
-        System.exit(0);
+    public void newGame() {
+        gui.close();
+        startGame();
     }
 }

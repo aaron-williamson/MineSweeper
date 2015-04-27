@@ -28,20 +28,24 @@ public class ConsoleDisplay {
     public static void printFieldRevealed(FieldGenerator aField) {
         // Print out the number lines
         System.out.print("      ");
-        for (int i = 0; i < aField.getField().length; i++) {
+        for (int i = 0; i < aField.getField()[0].length; i++) {
             if (i < 10)
                 System.out.print(" [" + (i) + "] ");
+            else if (i > 99)
+                System.out.print(" [" + (i) + "]");
             else
                 System.out.print(" [" + (i) + "]");
         }
         System.out.println();
-        for (int i = 0; i < aField.getField().length; i++) {
-            if (i < 10)
-                System.out.print("  [" + (i) + "] ");
+        for (int y = 0; y < aField.getField().length; y++) {
+            if (y < 10)
+                System.out.print("  [" + (y) + "] ");
+            else if (y > 99)
+                System.out.print(" [" + (y) + "}");
             else
-                System.out.print("  [" + (i) + "]");
-            for (int j = 0; j < aField.getField()[0].length; j++) {
-                int out = aField.getField()[i][j];
+                System.out.print("  [" + (y) + "]");
+            for (int x = 0; x < aField.getField()[0].length; x++) {
+                int out = aField.getField()[y][x];
                 if (out == -1) System.out.print("  X  ");
                 else if (out == 0) System.out.print("  .  ");
                 else System.out.printf("  %d  ",out);

@@ -25,10 +25,10 @@ public class MineCanvas extends JPanel implements MouseListener {
     private BufferedImage[] images = new BufferedImage[NUMBER_OF_IMAGES];
     private GUIDisplay gui;
 
-    public MineCanvas(FieldGenerator aField, GUIDisplay gui) {
+    public MineCanvas(FieldGenerator aField, GUIDisplay aGui) {
         // Initialize the field and gui
         field = aField;
-        this.gui = gui;
+        gui = aGui;
         // Initialize the image paths
         imagePaths[0] = "tileclear.png";
         imagePaths[1] = "tile1.png";
@@ -49,7 +49,7 @@ public class MineCanvas extends JPanel implements MouseListener {
         this.addMouseListener(this);
 
         // JPanel Stuff
-        this.setPreferredSize(new Dimension(field.getField().length * 32, field.getField()[0].length * 32));
+        this.setPreferredSize(new Dimension(field.getField()[0].length * 32, field.getField().length * 32));
         // Load the images
         loadImages();
     }
@@ -60,8 +60,8 @@ public class MineCanvas extends JPanel implements MouseListener {
     public void paint(Graphics g) {
         super.paintComponent(g);
         gui.updateMines();
-        for(int x = 0; x < field.getField().length; x++) {
-            for (int y = 0; y < field.getField()[0].length; y++) {
+        for(int x = 0; x < field.getField()[0].length; x++) {
+            for (int y = 0; y < field.getField().length; y++) {
                 if (field.getMask()[y][x] == FieldGenerator.MASK_HIDDEN) {
                     g.drawImage(images[HIDDEN], x * 32, y * 32, 32, 32, null);
                 } else if (field.getMask()[y][x] == FieldGenerator.MASK_MARKED) {
@@ -95,6 +95,23 @@ public class MineCanvas extends JPanel implements MouseListener {
         }
     }
 
+    /*
+    /**
+     * Load the images from imagePaths into the BufferedImage array
+     * images.
+     * FOR JAR FILE
+     *
+    private void loadImages() {
+        System.out.println(this.getClass().getClassLoader().getResourceAsStream("img/" + imagePaths[0]));
+        for (int i = 0; i < NUMBER_OF_IMAGES; i++) {
+            try {
+                images[i] = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream("img/" + imagePaths[i]));
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }*/
+
     @Override
     public void mouseExited(MouseEvent e) {
         // Do nothing
@@ -112,28 +129,30 @@ public class MineCanvas extends JPanel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        int y = (e.getX() / 32);
-        int x = (e.getY() / 32);
-        if (x < field.getField().length && y < field.getField()[0].length) {
+        if (field.getFirstClick())
+            gui.startTimer(); // Start timer
+        int x = (e.getX() / 32);
+        int y = (e.getY() / 32);
+        if (x < field.getField()[0].length && y < field.getField().length) {
             if (e.getButton() == MouseEvent.BUTTON1) {
                 this.gameLose = field.revealSpace(x, y);
                 this.repaint();
             } else if (e.getButton() == MouseEvent.BUTTON3) {
-                if (field.getMask()[x][y] == -1) {
+                if (field.getMask()[y][x] == -1) {
                     field.unMark(x, y);
                     this.repaint();
-                } else if (field.getMask()[x][y] == 0) {
+                } else if (field.getMask()[y][x] == 0) {
                     field.markMine(x, y);
                     this.repaint();
                 }
             }
             if (this.field.getGameWin()) {
-                MineSweeper.gameWin();
+                gui.gameWin();
             }
             else if (this.gameLose) {
                 field.loseGame();
                 this.repaint();
-                MineSweeper.gameLose();
+                gui.gameLose();
             }
         } else {
             JOptionPane.showMessageDialog(null, "ERROR: CLICK OUT OF BOUNDS", "CLICK OUT OF BOUNDS", JOptionPane.ERROR_MESSAGE);

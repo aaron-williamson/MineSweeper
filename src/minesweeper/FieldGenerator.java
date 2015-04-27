@@ -53,16 +53,16 @@ public class FieldGenerator {
         unrevealed = x * y;
         this.mines = mines;
         // First create the field and fill it with 0's (non-mines)
-        field = new int[x][y];
-        for (int i = 0; i < x; i++) {
-            for (int j = 0; j < y; j++) {
+        field = new int[y][x];
+        for (int i = 0; i < y; i++) {
+            for (int j = 0; j < x; j++) {
                 field[i][j] = FIELD_EMPTY;
             }
         }
         // Also create the reveal field and initialize it with false
-        mask = new int[x][y];
-        for (int i = 0; i < x; i++) {
-            for (int j = 0; j < y; j++) {
+        mask = new int[y][x];
+        for (int i = 0; i < y; i++) {
+            for (int j = 0; j < x; j++) {
                 mask[i][j] = MASK_HIDDEN;
             }
         }
@@ -72,7 +72,7 @@ public class FieldGenerator {
             int xMine = rand.nextInt(x - 1);
             int yMine = rand.nextInt(y - 1);
             // If the mine doesn't already exist, create it
-            if (field[xMine][yMine] != -1)
+            if (field[yMine][xMine] != -1)
                 placeMine(xMine, yMine);
             else // If the mine does already exist, make sure to decrement i
                 i--;
@@ -86,95 +86,101 @@ public class FieldGenerator {
      */
     private void placeMine(int x, int y) {
         // Create the mine
-        field[x][y] = FIELD_MINE;
+        field[y][x] = FIELD_MINE;
 
         // Modify the numbers around the mine HOORAY IF STATEMENTS
         // Top left
         if (x == 0 && y == 0) {
-            if (field[x][y+1] != -1) field[x][y+1] = field[x][y+1] + 1; // Right
-            if (field[x+1][y+1] != -1) field[x+1][y+1] = field[x+1][y+1] + 1; // Below right
-            if (field[x+1][y] != -1) field[x+1][y] = field[x+1][y] + 1; // Below middle
+            if (field[y][x+1] != -1) field[y][x+1] = field[y][x+1] + 1; // Right
+            if (field[y+1][x+1] != -1) field[y+1][x+1] = field[y+1][x+1] + 1; // Below right
+            if (field[y+1][x] != -1) field[y+1][x] = field[y+1][x] + 1; // Below middle
         }
         // Top right
-        else if (x == 0 && y == field[x].length - 1) {
-            if (field[x][y-1] != -1) field[x][y-1] = field[x][y-1] + 1; // Left
-            if (field[x+1][y-1] != -1) field[x+1][y-1] = field[x+1][y-1] + 1; // Below left
-            if (field[x+1][y] != -1) field[x+1][y] = field[x+1][y] + 1; // Below middle
+        else if (x == 0 && y == field[y].length - 1) {
+            if (field[y][x-1] != -1) field[y][x-1] = field[y][x-1] + 1; // Left
+            if (field[y+1][x-1] != -1) field[y+1][x-1] = field[y+1][x-1] + 1; // Below left
+            if (field[y+1][x] != -1) field[y+1][x] = field[y+1][x] + 1; // Below middle
         }
         // Bottom left
         else if (x == field.length - 1 && y == 0) {
-            if (field[x][y+1] != -1) field[x][y+1] = field[x][y+1] + 1; // Right
-            if (field[x-1][y+1] != -1) field[x-1][y+1] = field[x-1][y+1] + 1; // Above right
-            if (field[x-1][y] != -1) field[x-1][y] = field[x-1][y] + 1; // Above middle
+            if (field[y][x+1] != -1) field[y][x+1] = field[y][x+1] + 1; // Right
+            if (field[y-1][x+1] != -1) field[y-1][x+1] = field[y-1][x+1] + 1; // Above right
+            if (field[y-1][x] != -1) field[y-1][x] = field[y-1][x] + 1; // Above middle
         }
         // Bottom right
-        else if (x == field.length - 1 && y == field[x].length - 1) {
-            if (field[x][y-1] != -1) field[x][y-1] = field[x][y-1] + 1; // Left
-            if (field[x-1][y] != -1) field[x-1][y] = field[x-1][y] + 1; // Above middle
-            if (field[x-1][y-1] != -1) field[x-1][y-1] = field[x-1][y-1] + 1; // Above left
+        else if (x == field.length - 1 && y == field[y].length - 1) {
+            if (field[y][x-1] != -1) field[y][x-1] = field[y][x-1] + 1; // Left
+            if (field[y-1][x] != -1) field[y-1][x] = field[y-1][x] + 1; // Above middle
+            if (field[y-1][x-1] != -1) field[y-1][x-1] = field[y-1][x-1] + 1; // Above left
         }
         // Far left column
-        else if (y == 0) {
-            if (field[x-1][y+1] != -1) field[x-1][y+1] = field[x-1][y+1] + 1; // Above right
-            if (field[x-1][y] != -1) field[x-1][y] = field[x-1][y] + 1; // Above middle
-            if (field[x][y+1] != -1) field[x][y+1] = field[x][y+1] + 1; // Right
-            if (field[x+1][y] != -1) field[x+1][y] = field[x+1][y] + 1; // Below middle
-            if (field[x+1][y+1] != -1) field[x+1][y+1] = field[x+1][y+1] + 1; // Below right
+        else if (x == 0) {
+            if (field[y-1][x+1] != -1) field[y-1][x+1] = field[y-1][x+1] + 1; // Above right
+            if (field[y-1][x] != -1) field[y-1][x] = field[y-1][x] + 1; // Above middle
+            if (field[y][x+1] != -1) field[y][x+1] = field[y][x+1] + 1; // Right
+            if (field[y+1][x] != -1) field[y+1][x] = field[y+1][x] + 1; // Below middle
+            if (field[y+1][x+1] != -1) field[y+1][x+1] = field[y+1][x+1] + 1; // Below right
         }
         // Far right column
-        else if (y == field[x].length - 1) {
-            if (field[x+1][y] != -1) field[x+1][y] = field[x+1][y] + 1; // Below middle
-            if (field[x+1][y-1] != -1) field[x+1][y-1] = field[x+1][y-1] + 1; // Below left
-            if (field[x][y-1] != -1) field[x][y-1] = field[x][y-1] + 1; // Left
-            if (field[x-1][y] != -1) field[x-1][y] = field[x-1][y] + 1; // Above middle
-            if (field[x-1][y-1] != -1) field[x-1][y-1] = field[x-1][y-1] + 1; // Above left
+        else if (x == field[y].length - 1) {
+            if (field[y+1][x] != -1) field[y+1][x] = field[y+1][x] + 1; // Below middle
+            if (field[y+1][x-1] != -1) field[y+1][x-1] = field[y+1][x-1] + 1; // Below left
+            if (field[y][x-1] != -1) field[y][x-1] = field[y][x-1] + 1; // Left
+            if (field[y-1][x] != -1) field[y-1][x] = field[y-1][x] + 1; // Above middle
+            if (field[y-1][x-1] != -1) field[y-1][x-1] = field[y-1][x-1] + 1; // Above left
         }
         // Top row
-        else if (x == 0) {
-            if (field[x+1][y+1] != -1) field[x+1][y+1] = field[x+1][y+1] + 1; // Below right
-            if (field[x+1][y] != -1) field[x+1][y] = field[x+1][y] + 1; // Below middle
-            if (field[x+1][y-1] != -1) field[x+1][y-1] = field[x+1][y-1] + 1; // Below left
-            if (field[x][y+1] != -1) field[x][y+1] = field[x][y+1] + 1; // Right
-            if (field[x][y-1] != -1) field[x][y-1] = field[x][y-1] + 1; // Left
+        else if (y == 0) {
+            if (field[y+1][x+1] != -1) field[y+1][x+1] = field[y+1][x+1] + 1; // Below right
+            if (field[y+1][x] != -1) field[y+1][x] = field[y+1][x] + 1; // Below middle
+            if (field[y+1][x-1] != -1) field[y+1][x-1] = field[y+1][x-1] + 1; // Below left
+            if (field[y][x+1] != -1) field[y][x+1] = field[y][x+1] + 1; // Right
+            if (field[y][x-1] != -1) field[y][x-1] = field[y][x-1] + 1; // Left
         }
         // Bottom row
-        else if (x == field.length - 1) {
-            if (field[x][y+1] != -1) field[x][y+1] = field[x][y+1] + 1; // Right
-            if (field[x][y-1] != -1) field[x][y-1] = field[x][y-1] + 1; // Left
-            if (field[x-1][y+1] != -1) field[x-1][y+1] = field[x-1][y+1] + 1; // Above right
-            if (field[x-1][y] != -1) field[x-1][y] = field[x-1][y] + 1; // Above middle
-            if (field[x-1][y-1] != -1) field[x-1][y-1] = field[x-1][y-1] + 1; // Above left
+        else if (y == field.length - 1) {
+            if (field[y][x+1] != -1) field[y][x+1] = field[y][x+1] + 1; // Right
+            if (field[y][x-1] != -1) field[y][x-1] = field[y][x-1] + 1; // Left
+            if (field[y-1][x+1] != -1) field[y-1][x+1] = field[y-1][x+1] + 1; // Above right
+            if (field[y-1][x] != -1) field[y-1][x] = field[y-1][x] + 1; // Above middle
+            if (field[y-1][x-1] != -1) field[y-1][x-1] = field[y-1][x-1] + 1; // Above left
         }
         // Everything else
         else {
-            if (field[x+1][y+1] != -1) field[x+1][y+1] = field[x+1][y+1] + 1; // Below right
-            if (field[x+1][y] != -1) field[x+1][y] = field[x+1][y] + 1; // Below middle
-            if (field[x+1][y-1] != -1) field[x+1][y-1] = field[x+1][y-1] + 1; // Below left
-            if (field[x][y+1] != -1) field[x][y+1] = field[x][y+1] + 1; // Right
-            if (field[x][y-1] != -1) field[x][y-1] = field[x][y-1] + 1; // Left
-            if (field[x-1][y+1] != -1) field[x-1][y+1] = field[x-1][y+1] + 1; // Above right
-            if (field[x-1][y] != -1) field[x-1][y] = field[x-1][y] + 1; // Above middle
-            if (field[x-1][y-1] != -1) field[x-1][y-1] = field[x-1][y-1] + 1; // Above left
+            if (field[y+1][x+1] != -1) field[y+1][x+1] = field[y+1][x+1] + 1; // Below right
+            if (field[y+1][x] != -1) field[y+1][x] = field[y+1][x] + 1; // Below middle
+            if (field[y+1][x-1] != -1) field[y+1][x-1] = field[y+1][x-1] + 1; // Below left
+            if (field[y][x+1] != -1) field[y][x+1] = field[y][x+1] + 1; // Right
+            if (field[y][x-1] != -1) field[y][x-1] = field[y][x-1] + 1; // Left
+            if (field[y-1][x+1] != -1) field[y-1][x+1] = field[y-1][x+1] + 1; // Above right
+            if (field[y-1][x] != -1) field[y-1][x] = field[y-1][x] + 1; // Above middle
+            if (field[y-1][x-1] != -1) field[y-1][x-1] = field[y-1][x-1] + 1; // Above left
         }
     }
 
+    /**
+     * The function for revealing a space
+     * @param x the x-coordinate to be revealed
+     * @param y the y-coordinate to be revealed
+     * @return whether or not the game has been lost
+     */
     public boolean revealSpace(int x, int y) {
-        if (x > mask.length || y > mask[0].length) {
+        if (x > mask[0].length || y > mask.length) {
             return false;
         }
-        else if (mask[x][y] == MASK_MARKED) {
+        else if (mask[y][x] == MASK_MARKED) {
             return false;
         }
-        else if (field[x][y] == FIELD_MINE) {
+        else if (field[y][x] == FIELD_MINE) {
             if (firstClick) {
-                generateField(field.length, field[0].length, mines);
+                generateField(field[0].length, field.length, mines);
                 revealSpace(x, y);
             } else {
-                mask[x][y] = MASK_LOSE;
+                mask[y][x] = MASK_LOSE;
                 return true;
             }
         }
-        else if (mask[x][y] == MASK_REVEALED) {
+        else if (mask[y][x] == MASK_REVEALED) {
             return false;
         } else {
             firstClick = false;
@@ -184,83 +190,89 @@ public class FieldGenerator {
         return false;
     }
 
+    /**
+     * Recursive function for revealing all spaces when
+     * user reveals an empty space
+     * @param x the x coordinate to be revealed
+     * @param y the y coordinate to be revealed
+     */
     private void revealHelper(int x, int y) {
-        if (mask[x][y] == MASK_REVEALED) return;
-        if (mask[x][y] == MASK_MARKED) return;
-        else if (field[x][y] == 0) {
-            mask[x][y] = MASK_REVEALED;
+        if (mask[y][x] == MASK_REVEALED) return;
+        if (mask[y][x] == MASK_MARKED) return;
+        else if (field[y][x] == 0) {
+            mask[y][x] = MASK_REVEALED;
             unrevealed--;
             // Top left
             if (x == 0 && y == 0) {
-                revealHelper(x,y+1); // Right
+                revealHelper(x+1,y); // Right
                 revealHelper(x+1,y+1); // Below right
-                revealHelper(x+1,y); // Below middle
+                revealHelper(x,y+1); // Below
             }
             // Top right
-            else if (x == 0 && y == field[x].length - 1) {
-                revealHelper(x,y-1); // Left
-                revealHelper(x+1,y-1); // Below left
-                revealHelper(x+1,y); // Below middle
+            else if (x == field[0].length - 1 && y == 0) {
+                revealHelper(x-1,y); // Left
+                revealHelper(x-1,y+1); // Below left
+                revealHelper(x,y+1); // Below
             }
             // Bottom left
-            else if (x == field.length - 1 && y == 0) {
-                revealHelper(x,y+1); // Right
-                revealHelper(x-1,y+1); // Above right
-                revealHelper(x-1,y); // Above middle
+            else if (x == 0 && y == field.length - 1) {
+                revealHelper(x+1,y); // Right
+                revealHelper(x+1,y-1); // Above right
+                revealHelper(x,y-1); // Above middle
             }
             // Bottom right
-            else if (x == field.length - 1 && y == field[x].length - 1) {
-                revealHelper(x,y-1); // Left
-                revealHelper(x-1,y); // Above middle
+            else if (x == field[0].length - 1 && y == field.length - 1) {
+                revealHelper(x-1,y); // Left
+                revealHelper(x,y-1); // Above middle
                 revealHelper(x-1,y-1); // Above left
             }
             // Far left column
-            else if (y == 0) {
-                revealHelper(x-1,y+1); // Above right
-                revealHelper(x-1,y); // Above middle
-                revealHelper(x,y+1); // Right
-                revealHelper(x+1,y); // Below middle
+            else if (x == 0) {
+                revealHelper(x+1,y-1); // Above right
+                revealHelper(x,y-1); // Above middle
+                revealHelper(x+1,y); // Right
+                revealHelper(x,y+1); // Below middle
                 revealHelper(x+1,y+1); // Below right
             }
             // Far right column
-            else if (y == field[x].length - 1) {
-                revealHelper(x+1,y); // Below middle
-                revealHelper(x+1,y-1); // Below left
-                revealHelper(x,y-1); // Left
-                revealHelper(x-1,y); // Above middle
+            else if (x == field[0].length - 1) {
+                revealHelper(x,y+1); // Below middle
+                revealHelper(x-1,y+1); // Below left
+                revealHelper(x-1,y); // Left
+                revealHelper(x,y-1); // Above middle
                 revealHelper(x-1,y-1); // Above left
             }
             // Top row
-            else if (x == 0) {
+            else if (y == 0) {
                 revealHelper(x+1,y+1); // Below right
-                revealHelper(x+1,y); // Below middle
-                revealHelper(x+1,y-1); // Below left
-                revealHelper(x,y+1); // Right
-                revealHelper(x,y-1); // Left
+                revealHelper(x,y+1); // Below middle
+                revealHelper(x-1,y+1); // Below left
+                revealHelper(x+1,y); // Right
+                revealHelper(x-1,y); // Left
             }
             // Bottom row
-            else if (x == field.length - 1) {
-                revealHelper(x,y+1); // Right
-                revealHelper(x,y-1); // Left
-                revealHelper(x-1,y+1); // Above right
-                revealHelper(x-1,y); // Above middle
+            else if (y == field.length - 1) {
+                revealHelper(x+1,y); // Right
+                revealHelper(x-1,y); // Left
+                revealHelper(x+1,y-1); // Above right
+                revealHelper(x,y-1); // Above middle
                 revealHelper(x-1,y-1); // Above left
             }
             // Everything else
             else {
                 revealHelper(x+1,y+1); // Below right
-                revealHelper(x+1,y); // Below middle
-                revealHelper(x+1,y-1); // Below left
-                revealHelper(x,y+1); // Right
-                revealHelper(x,y-1); // Left
-                revealHelper(x-1,y+1); // Above right
-                revealHelper(x-1,y); // Above middle
+                revealHelper(x,y+1); // Below middle
+                revealHelper(x-1,y+1); // Below left
+                revealHelper(x+1,y); // Right
+                revealHelper(x-1,y); // Left
+                revealHelper(x+1,y-1); // Above right
+                revealHelper(x,y-1); // Above middle
                 revealHelper(x-1,y-1); // Above left
             }
         }
-        else if (field[x][y] == FIELD_MINE) return;
+        else if (field[y][x] == FIELD_MINE) return;
         else {
-            mask[x][y] = MASK_REVEALED;
+            mask[y][x] = MASK_REVEALED;
             unrevealed--;
         }
     }
@@ -271,17 +283,17 @@ public class FieldGenerator {
      * @param y the y coordinate
      */
     public void markMine(int x, int y) {
-        if (x > mask.length || y > mask[0].length) {
+        if (x > mask[0].length || y > mask.length) {
             return;
         }
-        else if (mask[x][y] == MASK_REVEALED) {
+        else if (mask[y][x] == MASK_REVEALED) {
             return;
         }
-        else if (mask[x][y] == MASK_MARKED) {
+        else if (mask[y][x] == MASK_MARKED) {
             return;
         }
         minesRemaining--;
-        mask[x][y] = MASK_MARKED;
+        mask[y][x] = MASK_MARKED;
     }
 
     /**
@@ -290,14 +302,14 @@ public class FieldGenerator {
      * @param y the y coordinate
      */
     public void unMark (int x, int y) {
-        if (x > mask.length || y > mask[0].length) {
+        if (x > mask[0].length || y > mask.length) {
             return;
         }
-        if (mask[x][y] != MASK_MARKED) {
+        if (mask[y][x] != MASK_MARKED) {
             return;
         }
         minesRemaining++;
-        mask[x][y] = MASK_HIDDEN;
+        mask[y][x] = MASK_HIDDEN;
     }
 
     /**
@@ -342,5 +354,8 @@ public class FieldGenerator {
                 }
             }
         }
+    }
+    public boolean getFirstClick() {
+        return firstClick;
     }
 }
