@@ -1,5 +1,7 @@
 package minesweeper;
 
+import javax.swing.*;
+
 /**
  * The connecting class for connecting the GUI and Logic
  */
@@ -18,14 +20,14 @@ public class MineSweeper {
             e.printStackTrace();
         }
         // Output the revealed field for debugging
-        ConsoleDisplay.printFieldRevealed(field);
+        //ConsoleDisplay.printFieldRevealed(field);
     }
 
     /**
      * The game over message
      */
-    public static void gameOver() {
-        System.out.println("You revealed a mine! GAME OVER");
+    public static void gameLose() {
+        JOptionPane.showMessageDialog(null, "Oops, you revealed a mine! You lose!", "Defeat", JOptionPane.PLAIN_MESSAGE);
         System.exit(0);
     }
 
@@ -33,7 +35,7 @@ public class MineSweeper {
      * The game win message
      */
     public static void gameWin() {
-        System.out.println("You won the game! Congratulations!");
+        JOptionPane.showMessageDialog(null, "Congratulations! You Win!", "Victory", JOptionPane.PLAIN_MESSAGE);
         System.exit(0);
     }
 }

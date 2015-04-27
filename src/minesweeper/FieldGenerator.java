@@ -26,6 +26,7 @@ public class FieldGenerator {
     private int minesRemaining;
     private int unrevealed;
     private int mines;
+    private boolean firstClick = true;
 
     /**
      * Constructor
@@ -165,13 +166,21 @@ public class FieldGenerator {
             return false;
         }
         else if (field[x][y] == FIELD_MINE) {
-            mask[x][y] = MASK_LOSE;
-            return true;
+            if (firstClick) {
+                generateField(field.length, field[0].length, mines);
+                revealSpace(x, y);
+            } else {
+                mask[x][y] = MASK_LOSE;
+                return true;
+            }
         }
         else if (mask[x][y] == MASK_REVEALED) {
             return false;
+        } else {
+            firstClick = false;
+            revealHelper(x, y);
+            return false;
         }
-        revealHelper(x, y);
         return false;
     }
 

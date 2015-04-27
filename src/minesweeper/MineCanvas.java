@@ -23,10 +23,12 @@ public class MineCanvas extends JPanel implements MouseListener {
     private static final int INCORRECT = 13;
     private String[] imagePaths = new String[NUMBER_OF_IMAGES];
     private BufferedImage[] images = new BufferedImage[NUMBER_OF_IMAGES];
+    private GUIDisplay gui;
 
-    public MineCanvas(FieldGenerator aField) {
-        // Initialize the field parameter
+    public MineCanvas(FieldGenerator aField, GUIDisplay gui) {
+        // Initialize the field and gui
         field = aField;
+        this.gui = gui;
         // Initialize the image paths
         imagePaths[0] = "tileclear.png";
         imagePaths[1] = "tile1.png";
@@ -57,6 +59,7 @@ public class MineCanvas extends JPanel implements MouseListener {
     @Override
     public void paint(Graphics g) {
         super.paintComponent(g);
+        gui.updateMines();
         for(int x = 0; x < field.getField().length; x++) {
             for (int y = 0; y < field.getField()[0].length; y++) {
                 if (field.getMask()[y][x] == FieldGenerator.MASK_HIDDEN) {
@@ -125,14 +128,12 @@ public class MineCanvas extends JPanel implements MouseListener {
                 }
             }
             if (this.field.getGameWin()) {
-                JOptionPane.showMessageDialog(null,"Congratulations! You Win!","Victory",JOptionPane.PLAIN_MESSAGE);
-                System.exit(0);
+                MineSweeper.gameWin();
             }
             else if (this.gameLose) {
                 field.loseGame();
                 this.repaint();
-                JOptionPane.showMessageDialog(null, "Oops, you revealed a mine! You lose!", "Defeat", JOptionPane.PLAIN_MESSAGE);
-                System.exit(0);
+                MineSweeper.gameLose();
             }
         } else {
             JOptionPane.showMessageDialog(null, "ERROR: CLICK OUT OF BOUNDS", "CLICK OUT OF BOUNDS", JOptionPane.ERROR_MESSAGE);
