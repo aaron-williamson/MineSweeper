@@ -51,6 +51,9 @@ public class FieldGenerator {
         // Initialize the variables
         minesRemaining = mines;
         unrevealed = x * y;
+        if (mines == unrevealed) {
+            System.exit(-1);
+        }
         this.mines = mines;
         // First create the field and fill it with 0's (non-mines)
         field = new int[y][x];
@@ -69,8 +72,8 @@ public class FieldGenerator {
         // Now randomize the mines and set the values around the mines
         for (int i = 0; i < mines; i++) {
             // Randomize the location of the mine
-            int xMine = rand.nextInt(x - 1);
-            int yMine = rand.nextInt(y - 1);
+            int xMine = rand.nextInt(x);
+            int yMine = rand.nextInt(y);
             // If the mine doesn't already exist, create it
             if (field[yMine][xMine] != -1)
                 placeMine(xMine, yMine);
@@ -96,13 +99,13 @@ public class FieldGenerator {
             if (field[y+1][x] != -1) field[y+1][x] = field[y+1][x] + 1; // Below middle
         }
         // Top right
-        else if (x == 0 && y == field[y].length - 1) {
+        else if (x == field[0].length -1 && y == 0) {
             if (field[y][x-1] != -1) field[y][x-1] = field[y][x-1] + 1; // Left
             if (field[y+1][x-1] != -1) field[y+1][x-1] = field[y+1][x-1] + 1; // Below left
             if (field[y+1][x] != -1) field[y+1][x] = field[y+1][x] + 1; // Below middle
         }
         // Bottom left
-        else if (x == field.length - 1 && y == 0) {
+        else if (x == 0 && y == field.length - 1) {
             if (field[y][x+1] != -1) field[y][x+1] = field[y][x+1] + 1; // Right
             if (field[y-1][x+1] != -1) field[y-1][x+1] = field[y-1][x+1] + 1; // Above right
             if (field[y-1][x] != -1) field[y-1][x] = field[y-1][x] + 1; // Above middle

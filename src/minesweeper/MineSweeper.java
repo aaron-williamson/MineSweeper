@@ -6,9 +6,9 @@ import javax.swing.*;
  * The connecting class for connecting the GUI and Logic
  */
 public class MineSweeper {
-    private static final int DEFAULT_X = 9;
-    private static final int DEFAULT_Y = 9;
-    private static final int DEFAULT_MINES = 10;
+    private static final int DEFAULT_X = 10;
+    private static final int DEFAULT_Y = 10;
+    private static final int DEFAULT_MINES = 100;
 
     private FieldGenerator field;
     private GUIDisplay gui;
