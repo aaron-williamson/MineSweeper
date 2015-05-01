@@ -8,7 +8,7 @@ import javax.swing.*;
 public class MineSweeper {
     private static final int DEFAULT_X = 10;
     private static final int DEFAULT_Y = 10;
-    private static final int DEFAULT_MINES = 100;
+    private static final int DEFAULT_MINES = 20;
 
     private FieldGenerator field;
     private GUIDisplay gui;

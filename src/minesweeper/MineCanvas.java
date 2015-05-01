@@ -14,6 +14,7 @@ import java.io.IOException;
  */
 public class MineCanvas extends JPanel implements MouseListener {
     private boolean gameLose = false;
+    private boolean gameWin = false;
     private FieldGenerator field;
     private static final int NUMBER_OF_IMAGES = 14;
     private static final int BOMB = 9;
@@ -24,6 +25,8 @@ public class MineCanvas extends JPanel implements MouseListener {
     private String[] imagePaths = new String[NUMBER_OF_IMAGES];
     private BufferedImage[] images = new BufferedImage[NUMBER_OF_IMAGES];
     private GUIDisplay gui;
+    private int tempX;
+    private int tempY;
 
     public MineCanvas(FieldGenerator aField, GUIDisplay aGui) {
         // Initialize the field and gui
@@ -119,7 +122,18 @@ public class MineCanvas extends JPanel implements MouseListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        // Do nothing
+        if (!gameLose && !gameWin) {
+            if (tempX != e.getX() || tempY != e.getY()) {
+                if ((e.getX() / 32 == tempX / 32) && (e.getY() / 32 == tempY / 32)) {
+                    this.mouseClicked(e);
+                } else {
+                    if (field.getMask()[tempY][tempX] == 0)
+                        this.getGraphics().drawImage(images[HIDDEN], tempX * 32, tempY * 32, 32, 32, null);
+                }
+            }
+            tempX = 0;
+            tempY = 0;
+        }
     }
 
     @Override
@@ -129,38 +143,44 @@ public class MineCanvas extends JPanel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (field.getFirstClick())
-            gui.startTimer(); // Start timer
-        int x = (e.getX() / 32);
-        int y = (e.getY() / 32);
-        if (x < field.getField()[0].length && y < field.getField().length) {
-            if (e.getButton() == MouseEvent.BUTTON1) {
-                this.gameLose = field.revealSpace(x, y);
-                this.repaint();
-            } else if (e.getButton() == MouseEvent.BUTTON3) {
-                if (field.getMask()[y][x] == -1) {
-                    field.unMark(x, y);
+        if (!gameLose && !gameWin) {
+            if (field.getFirstClick())
+                gui.startTimer(); // Start timer
+            int x = (e.getX() / 32);
+            int y = (e.getY() / 32);
+            if (x < field.getField()[0].length && y < field.getField().length) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    this.gameLose = field.revealSpace(x, y);
                     this.repaint();
-                } else if (field.getMask()[y][x] == 0) {
-                    field.markMine(x, y);
-                    this.repaint();
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
+                    if (field.getMask()[y][x] == -1) {
+                        field.unMark(x, y);
+                        this.repaint();
+                    } else if (field.getMask()[y][x] == 0) {
+                        field.markMine(x, y);
+                        this.repaint();
+                    }
                 }
+                if (gameWin = field.getGameWin()) {
+                    gui.gameWin();
+                } else if (this.gameLose) {
+                    field.loseGame();
+                    this.repaint();
+                    gui.gameLose();
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "ERROR: CLICK OUT OF BOUNDS", "CLICK OUT OF BOUNDS", JOptionPane.ERROR_MESSAGE);
             }
-            if (this.field.getGameWin()) {
-                gui.gameWin();
-            }
-            else if (this.gameLose) {
-                field.loseGame();
-                this.repaint();
-                gui.gameLose();
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "ERROR: CLICK OUT OF BOUNDS", "CLICK OUT OF BOUNDS", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        // Do nothing
+        if (!gameLose && !gameWin) {
+            tempX = e.getX();
+            tempY = e.getY();
+            if ((e.getButton() == MouseEvent.BUTTON1) && field.getMask()[e.getY() / 32][e.getX() / 32] == 0)
+                this.getGraphics().drawImage(images[0], (e.getX() / 32) * 32, (e.getY() / 32) * 32, 32, 32, null);
+        }
     }
 }
