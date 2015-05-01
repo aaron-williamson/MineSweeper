@@ -35,6 +35,12 @@ public class FieldGenerator {
         generateField(DEFAULT_X, DEFAULT_Y, DEFAULT_MINES);
     }
 
+    /**
+     * Proper constructor with size options
+     * @param x the x-size of the field
+     * @param y the y-size of the field
+     * @param mines the number of mines the field should have
+     */
     public FieldGenerator(int x, int y, int mines) {
         generateField(x, y, mines);
     }
@@ -111,7 +117,7 @@ public class FieldGenerator {
             if (field[y-1][x] != -1) field[y-1][x] = field[y-1][x] + 1; // Above middle
         }
         // Bottom right
-        else if (x == field.length - 1 && y == field[y].length - 1) {
+        else if (x == field[0].length - 1 && y == field.length - 1) {
             if (field[y][x-1] != -1) field[y][x-1] = field[y][x-1] + 1; // Left
             if (field[y-1][x] != -1) field[y-1][x] = field[y-1][x] + 1; // Above middle
             if (field[y-1][x-1] != -1) field[y-1][x-1] = field[y-1][x-1] + 1; // Above left
@@ -125,7 +131,7 @@ public class FieldGenerator {
             if (field[y+1][x+1] != -1) field[y+1][x+1] = field[y+1][x+1] + 1; // Below right
         }
         // Far right column
-        else if (x == field[y].length - 1) {
+        else if (x == field[0].length - 1) {
             if (field[y+1][x] != -1) field[y+1][x] = field[y+1][x] + 1; // Below middle
             if (field[y+1][x-1] != -1) field[y+1][x-1] = field[y+1][x-1] + 1; // Below left
             if (field[y][x-1] != -1) field[y][x-1] = field[y][x-1] + 1; // Left
@@ -339,6 +345,10 @@ public class FieldGenerator {
         return minesRemaining;
     }
 
+    /**
+     * Returns a boolean that's true if the game has been won
+     * @return whether or not the game has been won
+     */
     public boolean getGameWin() {
         return (unrevealed <= mines);
     }
@@ -358,7 +368,20 @@ public class FieldGenerator {
             }
         }
     }
+
+    /**
+     * Function for getting whether or not it's the first click
+     * @return the boolean true if it's the first click
+     */
     public boolean getFirstClick() {
         return firstClick;
+    }
+
+    /**
+     * Function for getting the total number of mines
+     * @return the number of mines this field was created with
+     */
+    public int getMines() {
+        return mines;
     }
 }

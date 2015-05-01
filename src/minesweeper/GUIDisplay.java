@@ -1,9 +1,12 @@
 package minesweeper;
 
 
+import com.sun.java.swing.plaf.windows.WindowsScrollBarUI;
+
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
+import javax.swing.plaf.basic.BasicScrollBarUI;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -66,13 +69,24 @@ public class GUIDisplay {
     private void firstStart() {
         // Create the window and canvas
         frame = new JFrame("Minesweeper");
-        startGUI();
+        frame.setLayout(new CardLayout());
+
+        // Add the master panel to the frame
+        setupMasterPanel();
+        frame.getContentPane().add(masterPanel);
+        frame.setIconImage(new ImageIcon("minesweeper/img/icon.png").getImage());
+
+        // Size the window and set it up
+        frame.setResizable(false);
+        frame.pack();
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     /**
      * For starting the GUI
      */
-    private void startGUI() {
+    private void setupMasterPanel() {
         canvas = new MineCanvas(field, this);
 
         // Create the master panel
@@ -85,15 +99,33 @@ public class GUIDisplay {
         b.fill = GridBagConstraints.HORIZONTAL;
         b.gridx = 0;
         b.gridy = 0;
+        b.weightx = 1;
         b.gridwidth = GridBagConstraints.REMAINDER;
 
-        // Add the canvas to a panel
+        // ScrollBar theming
+        UIManager.put("ScrollBar.thumb", new Color(0x0a4a5b));
+        UIManager.put("ScrollBar.thumbDarkShadow", BASE03);
+        UIManager.put("ScrollBar.thumbHighlight", BASE01);
+        UIManager.put("ScrollBar.thumbShadow", BASE02);
+        UIManager.put("ScrollBar.track", BASE01);
+        UIManager.put("ScrollPane.background", BASE02);
+
+        // Add the canvas to a panel and the panel to a scroll pane
         JPanel canvasPanel = new JPanel(new GridLayout(1, 1, 0 , 0));
         canvasPanel.add(canvas);
-        canvasPanel.setBorder(GUIDisplay.getSolarizedBorder());
+        JScrollPane canvasPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        canvasPane.setViewportView(canvasPanel);
+        canvasPane.getHorizontalScrollBar().setUI(new BasicScrollBarUI());
+        canvasPane.getVerticalScrollBar().setUI(new BasicScrollBarUI());
+        canvasPane.setBorder(GUIDisplay.getSolarizedBorder());
+        if (field.getField()[0].length >= 40 || field.getField().length >= 20) {
+            canvasPane.getViewport().setPreferredSize(new Dimension(1280,640));
+        }
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 2;
+        c.weightx = 1;
         c.gridwidth = GridBagConstraints.REMAINDER;
 
         // Add the timer Label
@@ -133,16 +165,7 @@ public class GUIDisplay {
         masterPanel.add(menu, b);
         masterPanel.add(timerLabel, t);
         masterPanel.add(mineLabel, m);
-        masterPanel.add(canvasPanel, c);
-
-        // Add the master panel to the frame
-        frame.getContentPane().add(masterPanel);
-
-        // Size the window and set it up
-        frame.setResizable(false);
-        frame.pack();
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        masterPanel.add(canvasPane, c);
     }
 
     /**
@@ -186,7 +209,7 @@ public class GUIDisplay {
      * Close the frame
      */
     public void close() {
-        frame.dispatchEvent( new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+        frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
     }
 
     /**
@@ -220,6 +243,8 @@ public class GUIDisplay {
         UIManager.put("PopupMenu.foreground", BASE03);
         UIManager.put("PopupMenu.background", BASE03);
         UIManager.put("PopupMenu.border",BorderFactory.createBevelBorder(BevelBorder.LOWERED, BASE02, BASE01));
+        UIManager.put("MenuItem.acceleratorForeground", BASE0);
+        UIManager.put("MenuItem.acceleratorSelectionForeground", BASE03);
         JMenuBar mineBar = new JMenuBar();
         mineBar.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         mineBar.setBorderPainted(false);
@@ -235,6 +260,7 @@ public class GUIDisplay {
 
         // Add the new game and exit items to the menu
         JMenuItem newGame = new JMenuItem("New Game", KeyEvent.VK_N);
+        newGame.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.ALT_MASK));
         newGame.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         newGame.setForeground(BASE1);
         newGame.setBackground(BASE02);
@@ -332,26 +358,59 @@ public class GUIDisplay {
     }
 
     private void menuExit() {
+        stopTimer();
         close();
     }
 
     private void menuNewGame() {
-
+        game.newGame();
     }
 
     private void menuBeginner() {
-
+        game.newGame(9, 9, 10);
     }
 
     private void menuIntermediate() {
-
+        game.newGame(16, 16, 40);
     }
 
     private void menuAdvanced() {
-
+        game.newGame(40, 20, 99);
     }
 
     private void menuCustom() {
+        // I SHALL FIGURE SOMETHING OUT HERE
+        game.newGame(45, 25, 36);
+    }
 
+    public void newGame(FieldGenerator aField) {
+        // Stop the timer
+        stopTimer();
+        // Set the new field
+        field = aField;
+        // Create the new timer and set it up
+        timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                timerUpdate();
+            }
+        });
+        time = 0;
+        timerLabel.setText(String.format("%03d", time));
+
+        // Updating the mine counter
+        updateMines();
+
+        // Create the new canvas
+        canvas.newGame(aField);
+
+        frame.getContentPane().removeAll();
+
+        setupMasterPanel();
+
+        frame.getContentPane().add(masterPanel);
+        frame.revalidate();
+        frame.repaint();
+        frame.pack();
     }
 }

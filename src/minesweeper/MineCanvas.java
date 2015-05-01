@@ -52,12 +52,15 @@ public class MineCanvas extends JPanel implements MouseListener {
         this.addMouseListener(this);
 
         // JPanel Stuff
-        this.setPreferredSize(new Dimension(field.getField()[0].length * 32, field.getField().length * 32));
+        //this.setPreferredSize(new Dimension(field.getField()[0].length * 32, field.getField().length * 32));
         // Load the images
         loadImages();
     }
 
-
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(field.getField()[0].length * 32, field.getField().length * 32);
+    }
 
     @Override
     public void paint(Graphics g) {
@@ -124,11 +127,12 @@ public class MineCanvas extends JPanel implements MouseListener {
     public void mouseReleased(MouseEvent e) {
         if (!gameLose && !gameWin) {
             if (tempX != e.getX() || tempY != e.getY()) {
-                if ((e.getX() / 32 == tempX / 32) && (e.getY() / 32 == tempY / 32)) {
+                if ((e.getX() / 32) == (tempX / 32) && (e.getY() / 32 == tempY / 32)) {
                     this.mouseClicked(e);
                 } else {
-                    if (field.getMask()[tempY][tempX] == 0)
-                        this.getGraphics().drawImage(images[HIDDEN], tempX * 32, tempY * 32, 32, 32, null);
+                    if (field.getMask()[tempY / 32][tempX / 32] == 0) {
+                        this.getGraphics().drawImage(images[HIDDEN], ((tempX / 32) * 32), ((tempY / 32) * 32), 32, 32, null);
+                    }
                 }
             }
             tempX = 0;
@@ -182,5 +186,12 @@ public class MineCanvas extends JPanel implements MouseListener {
             if ((e.getButton() == MouseEvent.BUTTON1) && field.getMask()[e.getY() / 32][e.getX() / 32] == 0)
                 this.getGraphics().drawImage(images[0], (e.getX() / 32) * 32, (e.getY() / 32) * 32, 32, 32, null);
         }
+    }
+
+    public void newGame(FieldGenerator aField) {
+        gameLose = false;
+        gameWin = false;
+        field = aField;
+        //this.setPreferredSize(new Dimension(field.getField()[0].length * 32, field.getField().length * 32));
     }
 }

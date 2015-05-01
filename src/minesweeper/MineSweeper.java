@@ -27,12 +27,22 @@ public class MineSweeper {
         ConsoleDisplay.printFieldRevealed(field);
     }
 
+    /**
+     * Start the game with default mines and grid size (beginner)
+     */
     public void startGame() {
         startGame(DEFAULT_X, DEFAULT_Y, DEFAULT_MINES);
     }
 
+    public void newGame(int x, int y, int mines) {
+        field = new FieldGenerator(x, y, mines);
+        gui.newGame(field);
+    }
+
+    /**
+     * Create a new game with previous size/mine settings
+     */
     public void newGame() {
-        gui.close();
-        startGame();
+        newGame(field.getField()[0].length, field.getField().length, field.getMines());
     }
 }
