@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 
 /**
  * Class for displaying the MineCraft game in a GUI.
@@ -185,7 +186,7 @@ public class GUIDisplay {
      * Close the frame
      */
     public void close() {
-        frame.dispose();
+        frame.dispatchEvent( new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
     }
 
     /**
@@ -331,7 +332,7 @@ public class GUIDisplay {
     }
 
     private void menuExit() {
-        System.exit(0);
+        close();
     }
 
     private void menuNewGame() {
