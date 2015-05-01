@@ -379,8 +379,11 @@ public class GUIDisplay {
     }
 
     private void menuCustom() {
-        // I SHALL FIGURE SOMETHING OUT HERE
-        game.newGame(45, 25, 36);
+        int[] custom = new int[3];
+
+        custom = getCustom();
+
+        game.newGame(custom[0], custom[1], custom[2]);
     }
 
     public void newGame(FieldGenerator aField) {
@@ -412,5 +415,92 @@ public class GUIDisplay {
         frame.revalidate();
         frame.repaint();
         frame.pack();
+    }
+
+    private int[] getCustom() {
+        int[] custom = new int[3];
+        custom[1] = 10;
+        custom[2] = 10;
+
+        JFrame input = new JFrame("Custom Grid");
+        input.setIconImage(new ImageIcon("minesweeper/img/icon.png").getImage());
+        input.setUndecorated(true);
+        input.setAlwaysOnTop(true);
+
+        JPanel inputPanel = new JPanel(new GridBagLayout());
+
+        GridBagConstraints c = new GridBagConstraints();
+        JLabel customLabel = new JLabel("Custom mine field");
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 2;
+        c.insets = new Insets(0, 0, 4, 0);
+        c.anchor=GridBagConstraints.CENTER;
+
+
+        JLabel width = new JLabel("Width:");
+        JLabel height = new JLabel("Height:");
+        JLabel mines = new JLabel("Mines:");
+        GridBagConstraints d = new GridBagConstraints();
+        d.gridx = 0;
+        d.gridy = 1;
+        inputPanel.add(width, d);
+        d.gridy = 2;
+        inputPanel.add(height, d);
+        d.gridy = 3;
+        inputPanel.add(mines, d);
+
+        GridBagConstraints b = new GridBagConstraints();
+        JTextField widthField = new JTextField();
+        widthField.setPreferredSize(new Dimension(50, 24));
+        b.gridx = 1;
+        b.gridy = 1;
+        inputPanel.add(widthField, b);
+
+        JTextField heightField = new JTextField();
+        heightField.setPreferredSize(new Dimension(50, 24));
+        GridBagConstraints f = new GridBagConstraints();
+        f.gridx = 1;
+        f.gridy = 2;
+        inputPanel.add(heightField, f);
+        JTextField mineField = new JTextField();
+        mineField.setPreferredSize(new Dimension(50, 24));
+        GridBagConstraints g = new GridBagConstraints();
+        g.gridx = 1;
+        g.gridy = 3;
+        inputPanel.add(mineField, g);
+
+
+        JButton ok = new JButton("Ok");
+        GridBagConstraints a = new GridBagConstraints();
+        a.gridx = 0;
+        a.gridy = 4;
+        a.insets = new Insets(4, 0, 0, 4);
+        a.anchor = GridBagConstraints.CENTER;
+        JButton cancel = new JButton("Cancel");
+        GridBagConstraints h = new GridBagConstraints();
+        h.gridx = 1;
+        h.gridy = 4;
+        h.insets = new Insets(4, 4, 0, 0);
+        inputPanel.add(cancel, h);
+
+
+        inputPanel.add(ok, a);
+        inputPanel.add(customLabel, c);
+        inputPanel.add(widthField, b);
+        input.getContentPane().add(inputPanel);
+        input.setResizable(false);
+
+
+        input.setSize(new Dimension(200, 175));
+        input.setVisible(true);
+        input.setLocationRelativeTo(frame);
+        input.setLocation((int)frame.getLocationOnScreen().getX() + frame.getWidth()/2 - input.getWidth()/2,
+                (int)frame.getLocationOnScreen().getY() + frame.getHeight()/2 - input.getHeight()/2);
+
+
+        custom[0] = Integer.parseInt(widthField.getText());
+
+        return custom;
     }
 }
