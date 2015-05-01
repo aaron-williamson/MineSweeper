@@ -45,6 +45,10 @@ public class GUIDisplay {
         firstStart();
     }
 
+    /**
+     * The class for creating a border that matches the color scheme
+     * @return a solarized border
+     */
     private static Border getSolarizedBorder() {
         // Colors
         Color solarizedShadow = new Color(0x002b36);
@@ -55,12 +59,18 @@ public class GUIDisplay {
         return myBorder;
     }
 
+    /**
+     * The first creation of the JFrame
+     */
     private void firstStart() {
         // Create the window and canvas
         frame = new JFrame("Minesweeper");
         startGUI();
     }
 
+    /**
+     * For starting the GUI
+     */
     private void startGUI() {
         canvas = new MineCanvas(field, this);
 
@@ -134,27 +144,46 @@ public class GUIDisplay {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    /**
+     * Updates the number of mines remaining
+     */
     public void updateMines() {
         mineLabel.setText(String.format("%03d", field.getMinesRemaining()));
     }
 
+    /**
+     * Updates the game timer
+     */
     public void timerUpdate() {
         time++;
         timerLabel.setText(String.format("%03d", time));
     }
 
+    /**
+     * Starts the game timer
+     */
     public void startTimer() {
         timer.start();
     }
 
+    /**
+     * Stops the game timer
+     */
     public void stopTimer() {
         timer.stop();
     }
 
+    /**
+     * Get the current game time
+     * @return the game time
+     */
     public int getTime() {
         return time;
     }
 
+    /**
+     * Close the frame
+     */
     public void close() {
         frame.dispose();
     }
@@ -175,15 +204,21 @@ public class GUIDisplay {
         stopTimer();
     }
 
+    /**
+     * The class for creating a menu bar that matches the color theme
+     * @return a menu bar matching the color scheme
+     */
     private JMenuBar mineMenuBar() {
+        // UI Manager stuff for the menu
         UIManager.put("MenuItem.selectionBackground", BASE0);
         UIManager.put("MenuItem.selectionForeground", BASE02);
         UIManager.put("MenuBar.selectionBackground", BASE0);
         UIManager.put("MenuBar.selectionForeground", BASE02);
         UIManager.put("Menu.selectionBackground", BASE0);
         UIManager.put("Menu.selectionForeground", BASE02);
-        UIManager.put("PopupMenu.Foreground", BASE03);
-        UIManager.put("PopupMenu.Background", BASE01);
+        UIManager.put("PopupMenu.foreground", BASE03);
+        UIManager.put("PopupMenu.background", BASE03);
+        UIManager.put("PopupMenu.border",BorderFactory.createBevelBorder(BevelBorder.LOWERED, BASE02, BASE01));
         JMenuBar mineBar = new JMenuBar();
         mineBar.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         mineBar.setBorderPainted(false);
@@ -203,11 +238,23 @@ public class GUIDisplay {
         newGame.setForeground(BASE1);
         newGame.setBackground(BASE02);
         newGame.setBorderPainted(false);
+        newGame.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                menuNewGame();
+            }
+        });
         JMenuItem exit = new JMenuItem("Exit", KeyEvent.VK_E);
         exit.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         exit.setForeground(BASE1);
         exit.setBackground(BASE02);
         exit.setBorderPainted(false);
+        exit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                menuExit();
+            }
+        });
 
         // Create the difficulties and add them to the difficulty menu
         JMenuItem beginner = new JMenuItem("Beginner", KeyEvent.VK_B);
@@ -215,21 +262,45 @@ public class GUIDisplay {
         beginner.setBorderPainted(false);
         beginner.setForeground(BASE1);
         beginner.setBackground(BASE02);
+        beginner.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                menuBeginner();
+            }
+        });
         JMenuItem intermediate = new JMenuItem("Intermediate", KeyEvent.VK_I);
         intermediate.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         intermediate.setBorderPainted(false);
         intermediate.setForeground(BASE1);
         intermediate.setBackground(BASE02);
+        intermediate.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                menuIntermediate();
+            }
+        });
         JMenuItem advanced = new JMenuItem("Advanced", KeyEvent.VK_A);
         advanced.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         advanced.setBorderPainted(false);
         advanced.setForeground(BASE1);
         advanced.setBackground(BASE02);
+        advanced.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                menuAdvanced();
+            }
+        });
         JMenuItem custom = new JMenuItem("Custom", KeyEvent.VK_C);
         custom.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         custom.setBorderPainted(false);
         custom.setForeground(BASE1);
         custom.setBackground(BASE02);
+        custom.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                menuCustom();
+            }
+        });
 
         // Add components to the menu
         gameMenu.add(newGame);
@@ -246,12 +317,40 @@ public class GUIDisplay {
         return mineBar;
     }
 
-    JSeparator mineSeparator() {
+    /**
+     * The class for getting a separator for the matching color scheme
+     * @return a separator matching the color scheme
+     */
+    private JSeparator mineSeparator() {
         // Create the separator
         JSeparator sep = new JSeparator();
         sep.setBackground(BASE02);
         sep.setForeground(BASE1);
 
         return sep;
+    }
+
+    private void menuExit() {
+        System.exit(0);
+    }
+
+    private void menuNewGame() {
+
+    }
+
+    private void menuBeginner() {
+
+    }
+
+    private void menuIntermediate() {
+
+    }
+
+    private void menuAdvanced() {
+
+    }
+
+    private void menuCustom() {
+
     }
 }
