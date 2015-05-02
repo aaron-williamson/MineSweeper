@@ -1,8 +1,6 @@
 package minesweeper;
 
 
-import com.sun.java.swing.plaf.windows.WindowsScrollBarUI;
-
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -119,8 +117,12 @@ public class GUIDisplay {
         canvasPane.getHorizontalScrollBar().setUI(new BasicScrollBarUI());
         canvasPane.getVerticalScrollBar().setUI(new BasicScrollBarUI());
         canvasPane.setBorder(GUIDisplay.getSolarizedBorder());
-        if (field.getField()[0].length >= 40 || field.getField().length >= 20) {
+        if (field.getField()[0].length > 40 && field.getField().length > 20) {
             canvasPane.getViewport().setPreferredSize(new Dimension(1280,640));
+        } else if (field.getField()[0].length > 40 && field.getField().length <= 20) {
+            canvasPane.getViewport().setPreferredSize(new Dimension(1280, field.getField().length * 32));
+        } else if (field.getField().length > 20 && field.getField()[0].length <= 40) {
+            canvasPane.getViewport().setPreferredSize(new Dimension(field.getField()[0].length* 32, 640));
         }
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -226,6 +228,7 @@ public class GUIDisplay {
     public void gameWin() {
         frame.setTitle("Minesweeper - GAME WIN");
         stopTimer();
+        showWinPopup();
     }
 
     /**
@@ -379,11 +382,7 @@ public class GUIDisplay {
     }
 
     private void menuCustom() {
-        int[] custom = new int[3];
-
-        custom = getCustom();
-
-        game.newGame(custom[0], custom[1], custom[2]);
+        getCustom();
     }
 
     public void newGame(FieldGenerator aField) {
@@ -417,15 +416,22 @@ public class GUIDisplay {
         frame.pack();
     }
 
-    private int[] getCustom() {
-        int[] custom = new int[3];
-        custom[1] = 10;
-        custom[2] = 10;
+    private void getCustom() {
+        // Theming
+        UIManager.put("Panel.background", BASE02);
+        UIManager.put("Label.foreground", BASE0);
+        UIManager.put("TextField.background", BASE1);
+        UIManager.put("TextField.foreground", BASE03);
+        UIManager.put("TextField.border", BorderFactory.createBevelBorder(BevelBorder.LOWERED,BASE01,BASE02));
+        UIManager.put("TextField.font", new Font(Font.SANS_SERIF,Font.BOLD, 16));
+        UIManager.put("Button.background", BASE1);
+        UIManager.put("Button.foreground", BASE03);
 
-        JFrame input = new JFrame("Custom Grid");
+        final JDialog input = new JDialog(frame, "Custom Grid");
         input.setIconImage(new ImageIcon("minesweeper/img/icon.png").getImage());
         input.setUndecorated(true);
         input.setAlwaysOnTop(true);
+        input.getRootPane().setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED,BASE0,BASE02));
 
         JPanel inputPanel = new JPanel(new GridBagLayout());
 
@@ -434,7 +440,7 @@ public class GUIDisplay {
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 2;
-        c.insets = new Insets(0, 0, 4, 0);
+        c.insets = new Insets(0, 0, 15, 0);
         c.anchor=GridBagConstraints.CENTER;
 
 
@@ -444,6 +450,8 @@ public class GUIDisplay {
         GridBagConstraints d = new GridBagConstraints();
         d.gridx = 0;
         d.gridy = 1;
+        d.anchor = GridBagConstraints.LINE_END;
+        d.insets = new Insets(2, 0, 0, 0);
         inputPanel.add(width, d);
         d.gridy = 2;
         inputPanel.add(height, d);
@@ -451,37 +459,55 @@ public class GUIDisplay {
         inputPanel.add(mines, d);
 
         GridBagConstraints b = new GridBagConstraints();
-        JTextField widthField = new JTextField();
-        widthField.setPreferredSize(new Dimension(50, 24));
+        final JTextField widthField = new JTextField(String.valueOf(field.getField().length), 4);
         b.gridx = 1;
         b.gridy = 1;
+        b.insets = new Insets(2, 0, 0, 0);
         inputPanel.add(widthField, b);
 
-        JTextField heightField = new JTextField();
-        heightField.setPreferredSize(new Dimension(50, 24));
+        final JTextField heightField = new JTextField(String.valueOf(field.getField()[0].length), 4);
         GridBagConstraints f = new GridBagConstraints();
         f.gridx = 1;
         f.gridy = 2;
+        f.insets = new Insets(2, 0, 0, 0);
         inputPanel.add(heightField, f);
-        JTextField mineField = new JTextField();
-        mineField.setPreferredSize(new Dimension(50, 24));
+
+        final JTextField mineField = new JTextField(String.valueOf(field.getMines()), 4);
         GridBagConstraints g = new GridBagConstraints();
         g.gridx = 1;
         g.gridy = 3;
+        g.insets = new Insets(2, 0, 0, 0);
         inputPanel.add(mineField, g);
 
 
         JButton ok = new JButton("Ok");
+        ok.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int width = Integer.parseInt(widthField.getText());
+                int height = Integer.parseInt(heightField.getText());
+                int mines = Integer.parseInt(mineField.getText());
+                game.newGame(width, height, mines);
+                input.dispose();
+            }
+        });
+        frame.getRootPane().setDefaultButton(ok);
         GridBagConstraints a = new GridBagConstraints();
         a.gridx = 0;
         a.gridy = 4;
-        a.insets = new Insets(4, 0, 0, 4);
+        a.insets = new Insets(15, 0, 0, 4);
         a.anchor = GridBagConstraints.CENTER;
         JButton cancel = new JButton("Cancel");
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                input.dispose();
+            }
+        });
         GridBagConstraints h = new GridBagConstraints();
         h.gridx = 1;
         h.gridy = 4;
-        h.insets = new Insets(4, 4, 0, 0);
+        h.insets = new Insets(15, 4, 0, 0);
         inputPanel.add(cancel, h);
 
 
@@ -497,10 +523,54 @@ public class GUIDisplay {
         input.setLocationRelativeTo(frame);
         input.setLocation((int)frame.getLocationOnScreen().getX() + frame.getWidth()/2 - input.getWidth()/2,
                 (int)frame.getLocationOnScreen().getY() + frame.getHeight()/2 - input.getHeight()/2);
+    }
 
+    private void showWinPopup() {
+    // Theming
+        UIManager.put("Panel.background", BASE02);
+        UIManager.put("Label.foreground", BASE0);
+        UIManager.put("Button.background", BASE1);
+        UIManager.put("Button.foreground", BASE03);
 
-        custom[0] = Integer.parseInt(widthField.getText());
+        final JDialog win = new JDialog(frame,"WINNER!");
+        JPanel winPanel = new JPanel(new GridBagLayout());
+        JLabel winLabel = new JLabel("You win! Congratulations!");
+        JLabel scoreLabel = new JLabel("Your time is: " + getTime());
+        JButton okButton = new JButton("Ok");
+        okButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                win.dispose();
+            }
+        });
 
-        return custom;
+        GridBagConstraints a = new GridBagConstraints();
+        a.gridx = 0;
+        a.gridy = 0;
+        a.insets = new Insets(0, 0, 2, 0);
+        a.anchor = GridBagConstraints.CENTER;
+        winPanel.add(winLabel, a);
+
+        GridBagConstraints b = new GridBagConstraints();
+        b.gridx = 0;
+        b.gridy = 1;
+        b.insets = new Insets(0, 0, 2, 0);
+        b.anchor = GridBagConstraints.CENTER;
+        winPanel.add(scoreLabel, b);
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 2;
+        c.insets = new Insets(15, 0, 0, 0);
+        c.anchor = GridBagConstraints.CENTER;
+        winPanel.add(okButton, c);
+        win.getContentPane().add(winPanel);
+
+        win.setUndecorated(true);
+        win.setSize(new Dimension(200, 175));
+        win.setVisible(true);
+        win.setLocationRelativeTo(frame);
+        win.setLocation((int)frame.getLocationOnScreen().getX() + frame.getWidth()/2 - win.getWidth()/2,
+                (int)frame.getLocationOnScreen().getY() + frame.getHeight()/2 - win.getHeight()/2);
     }
 }

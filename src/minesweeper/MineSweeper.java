@@ -1,7 +1,5 @@
 package minesweeper;
 
-import javax.swing.*;
-
 /**
  * The connecting class for connecting the GUI and Logic
  */
@@ -23,8 +21,6 @@ public class MineSweeper {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // Output the revealed field for debugging
-        ConsoleDisplay.printFieldRevealed(field);
     }
 
     /**
