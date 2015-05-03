@@ -108,10 +108,9 @@ public class MineCanvas extends JPanel implements MouseListener {
      * FOR JAR FILE
      *
     private void loadImages() {
-        System.out.println(this.getClass().getClassLoader().getResourceAsStream("img/" + imagePaths[0]));
         for (int i = 0; i < NUMBER_OF_IMAGES; i++) {
             try {
-                images[i] = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream("img/" + imagePaths[i]));
+                images[i] = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream("minesweeper/img/" + imagePaths[i]));
             } catch(IOException e) {
                 e.printStackTrace();
             }

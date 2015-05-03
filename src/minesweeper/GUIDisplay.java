@@ -117,12 +117,24 @@ public class GUIDisplay {
         canvasPane.getHorizontalScrollBar().setUI(new BasicScrollBarUI());
         canvasPane.getVerticalScrollBar().setUI(new BasicScrollBarUI());
         canvasPane.setBorder(GUIDisplay.getSolarizedBorder());
-        if (field.getField()[0].length > 40 && field.getField().length > 20) {
-            canvasPane.getViewport().setPreferredSize(new Dimension(1280,640));
-        } else if (field.getField()[0].length > 40 && field.getField().length <= 20) {
-            canvasPane.getViewport().setPreferredSize(new Dimension(1280, field.getField().length * 32));
-        } else if (field.getField().length > 20 && field.getField()[0].length <= 40) {
-            canvasPane.getViewport().setPreferredSize(new Dimension(field.getField()[0].length* 32, 640));
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        if (field.getField()[0].length * 32 > screenSize.getWidth() - 200 &&
+                field.getField().length * 32 > screenSize.getHeight() - 200) {
+            canvasPane.getViewport().setPreferredSize(
+                    new Dimension((int)screenSize.getWidth() - 200,  (int)screenSize.getHeight() - 200)
+            );
+        } else if (field.getField()[0].length * 32 > screenSize.getWidth() - 200) {
+            canvasPane.getViewport().setPreferredSize(
+                    new Dimension((int)screenSize.getWidth() - 200, field.getField().length * 32)
+            );
+        } else if (field.getField().length * 32 > screenSize.getHeight() - 200) {
+            canvasPane.getViewport().setPreferredSize(
+                    new Dimension(field.getField()[0].length * 32, (int)screenSize.getHeight() - 200)
+            );
+        } else {
+            canvasPane.getViewport().setPreferredSize(
+                    new Dimension(field.getField()[0].length * 32, field.getField().length * 32)
+            );
         }
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -410,6 +422,7 @@ public class GUIDisplay {
 
         setupMasterPanel();
 
+        frame.setTitle("Minesweeper");
         frame.getContentPane().add(masterPanel);
         frame.revalidate();
         frame.repaint();
@@ -459,13 +472,13 @@ public class GUIDisplay {
         inputPanel.add(mines, d);
 
         GridBagConstraints b = new GridBagConstraints();
-        final JTextField widthField = new JTextField(String.valueOf(field.getField().length), 4);
+        final JTextField widthField = new JTextField(String.valueOf(field.getField()[0].length), 4);
         b.gridx = 1;
         b.gridy = 1;
         b.insets = new Insets(2, 0, 0, 0);
         inputPanel.add(widthField, b);
 
-        final JTextField heightField = new JTextField(String.valueOf(field.getField()[0].length), 4);
+        final JTextField heightField = new JTextField(String.valueOf(field.getField().length), 4);
         GridBagConstraints f = new GridBagConstraints();
         f.gridx = 1;
         f.gridy = 2;
